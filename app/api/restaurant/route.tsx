@@ -1,8 +1,10 @@
+import prisma from "@/prisma/prisma";
 import { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  return new Response("Hello, Next.js!");
+  await prisma.restaurant.deleteMany();
+  return NextResponse.json({ message: "success" });
 }
 
 export async function POST(request: Request, res: NextApiResponse) {
