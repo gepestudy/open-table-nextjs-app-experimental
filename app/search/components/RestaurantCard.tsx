@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+interface IProps {
+  location: string;
+}
 const RestaurantCard = () => {
   return (
     <div className="border-b flex pb-5">

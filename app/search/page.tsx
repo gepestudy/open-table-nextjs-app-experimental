@@ -1,8 +1,25 @@
+import prisma from "@/prisma/prisma";
 import Header from "./components/Header";
 import RestaurantCard from "./components/RestaurantCard";
 import SearchSidebar from "./components/SearchSidebar";
 
-const Search = () => {
+interface IProps {
+  searchParams: { location: string };
+}
+const Search = async ({ searchParams }: IProps) => {
+  const restaurant = await prisma.location.findMany({
+    where: {
+      name: {
+        contains: searchParams.location,
+      },
+    },
+    select: {
+      restaurants: true,
+    },
+  });
+
+  console.log({ restaurant });
+
   return (
     <>
       <Header />
