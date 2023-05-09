@@ -11,7 +11,7 @@ const SearchBar = () => {
       setLocation("");
       return;
     }
-    router.push(`/search?location=${location}`);
+    router.push(`/search?city=${location}`);
   }
   return (
     <div className="text-left text-lg py-3 m-auto flex justify-center">
