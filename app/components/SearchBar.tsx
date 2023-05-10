@@ -7,10 +7,10 @@ const SearchBar = () => {
   const [location, setLocation] = useState("");
 
   function searchAction() {
-    if (location == "" || location.length === 0 || /^\s+$/.test(location)) {
-      setLocation("");
-      return;
-    }
+    // if (location == "" || location.length === 0 || /^\s+$/.test(location)) {
+    //   setLocation("");
+    //   return;
+    // }
     router.push(`/search?city=${location}`);
   }
   return (

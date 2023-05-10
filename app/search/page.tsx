@@ -8,7 +8,7 @@ interface IProps {
   searchParams: { city: string };
 }
 interface IRestaurant {
-  restaurant_name: string;
+  name: string;
 
   slug: string;
   price: PRICE;
@@ -20,38 +20,49 @@ interface IRestaurant {
     name: string;
   };
 }
+
+const fetchRestaurants = async (city: string | undefined) => {
+  const select = {
+    name: true,
+    slug: true,
+    main_image: true,
+    price: true,
+    cuisine: {
+      select: {
+        name: true,
+      },
+    },
+    location: {
+      select: {
+        name: true,
+      },
+    },
+  };
+
+  if (!city)
+    return prisma.restaurant.findMany({
+      select,
+    });
+
+  return prisma.restaurant.findMany({
+    select,
+    where: {
+      location: {
+        name: {
+          contains: `${city.toLowerCase()}`,
+          mode: "insensitive",
+        },
+      },
+    },
+  });
+};
 const Search = async ({ searchParams }: IProps) => {
   // sql raw
   // const restaurants: IRestaurant[] =
   //   await prisma.$queryRaw`SELECT r."name" AS restaurant_name, l."name" AS location_name, r."slug", r."price", r."main_image" AS image, c."name" as cuisine_name FROM "Restaurant" r RIGHT JOIN "Location" l ON r."location_id" = l."id" RIGHT JOIN "Cuisine" c ON r."cuisine_id" = c."id" WHERE l."name" ILIKE '%ottawa%'`;
 
   // lewat prisma client
-  const restaurants = await prisma.restaurant.findMany({
-    select: {
-      name: true,
-      slug: true,
-      main_image: true,
-      price: true,
-      cuisine: {
-        select: {
-          name: true,
-        },
-      },
-      location: {
-        select: {
-          name: true,
-        },
-      },
-    },
-    where: {
-      location: {
-        name: {
-          contains: `${searchParams.city}`,
-          mode: "insensitive",
-        },
-      },
-    },
-  });
+  const restaurants: IRestaurant[] = await fetchRestaurants(searchParams.city);
 
   return (
     <>
@@ -62,7 +73,7 @@ const Search = async ({ searchParams }: IProps) => {
           {restaurants.length == 0 || restaurants == null ? (
             <p>There are no restaurants in the city you are looking for</p>
           ) : (
-            restaurants.map((restaurant) => (
+            restaurants.map((restaurant: IRestaurant) => (
               <RestaurantCard
                 restaurant_name={restaurant.name}
                 location_name={restaurant.location.name}
