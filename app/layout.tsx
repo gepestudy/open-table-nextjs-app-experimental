@@ -13,6 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" type="image/x-icon" href="/public/favicon.ico" />
+      </head>
       <body>
         <main className="bg-gray-100 min-h-screen min-w-screen">
           <main className="max-w-screen-2xl m-auto bg-white">

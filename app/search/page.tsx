@@ -1,11 +1,15 @@
 import prisma from "@/prisma/prisma";
+import { PRICE } from "@prisma/client";
 import Header from "./components/Header";
 import RestaurantCard from "./components/RestaurantCard";
 import SearchSidebar from "./components/SearchSidebar";
-import { PRICE } from "@prisma/client";
 
 interface IProps {
-  searchParams: { city: string };
+  searchParams: {
+    city: string | undefined;
+    cuisine: string | undefined;
+    price: PRICE | undefined;
+  };
 }
 interface IRestaurant {
   name: string;
@@ -21,7 +25,15 @@ interface IRestaurant {
   };
 }
 
-const fetchRestaurants = async (city: string | undefined) => {
+const fetchRestaurants = async ({
+  city,
+  cuisine,
+  price,
+}: {
+  city: string | undefined;
+  cuisine: string | undefined;
+  price: PRICE | undefined;
+}) => {
   const select = {
     name: true,
     slug: true,
@@ -39,36 +51,98 @@ const fetchRestaurants = async (city: string | undefined) => {
     },
   };
 
-  if (!city)
+  const filter: any = {
+    AND: [],
+  };
+
+  if (city) {
+    filter.AND.push({
+      location: {
+        name: {
+          contains: `${city?.toLowerCase()}`,
+          mode: "insensitive",
+        },
+      },
+    });
+  }
+  if (cuisine) {
+    filter.AND.push({
+      cuisine: {
+        name: {
+          contains: `${cuisine?.toLowerCase()}`,
+          mode: "insensitive",
+        },
+      },
+    });
+  }
+  if (price) {
+    filter.AND.push({
+      price: {
+        equals: price,
+      },
+    });
+  }
+
+  if (!city && !cuisine && !price)
     return prisma.restaurant.findMany({
       select,
     });
 
   return prisma.restaurant.findMany({
     select,
-    where: {
-      location: {
-        name: {
-          contains: `${city.toLowerCase()}`,
-          mode: "insensitive",
-        },
-      },
-    },
+    where: filter,
+    // where: {
+    //   location: {
+    //     name: {
+    //       contains: `${city?.toLowerCase()}`,
+    //       mode: "insensitive",
+    //     },
+    //   },
+    //   cuisine: {
+    //     name: {
+    //       contains: `${cuisine?.toLowerCase()}`,
+    //       mode: "insensitive",
+    //     },
+    //   },
+    //   price: {
+    //     equals: price,
+    //   },
+    // },
   });
 };
-const Search = async ({ searchParams }: IProps) => {
-  // sql raw
-  // const restaurants: IRestaurant[] =
-  //   await prisma.$queryRaw`SELECT r."name" AS restaurant_name, l."name" AS location_name, r."slug", r."price", r."main_image" AS image, c."name" as cuisine_name FROM "Restaurant" r RIGHT JOIN "Location" l ON r."location_id" = l."id" RIGHT JOIN "Cuisine" c ON r."cuisine_id" = c."id" WHERE l."name" ILIKE '%ottawa%'`;
 
-  // lewat prisma client
-  const restaurants: IRestaurant[] = await fetchRestaurants(searchParams.city);
+function fetchAllLocation() {
+  return prisma.location.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+
+function fetchAllCuisine() {
+  return prisma.cuisine.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+
+const Search = async ({ searchParams }: IProps) => {
+  const restaurants: IRestaurant[] = await fetchRestaurants(searchParams);
+  const locations = await fetchAllLocation();
+  const cuisines = await fetchAllCuisine();
 
   return (
     <>
       <Header />
       <div className="flex py-4 m-auto w-2/3 justify-between items-start">
-        <SearchSidebar />
+        <SearchSidebar
+          locations={locations}
+          cuisines={cuisines}
+          searchParams={searchParams}
+        />
         <div className="w-5/6">
           {restaurants.length == 0 || restaurants == null ? (
             <p>There are no restaurants in the city you are looking for</p>

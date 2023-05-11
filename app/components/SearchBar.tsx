@@ -7,11 +7,9 @@ const SearchBar = () => {
   const [location, setLocation] = useState("");
 
   function searchAction() {
-    // if (location == "" || location.length === 0 || /^\s+$/.test(location)) {
-    //   setLocation("");
-    //   return;
-    // }
-    router.push(`/search?city=${location}`);
+    router.push(
+      /^\s*$/.test(location) ? "/search" : `/search?city=${location}`
+    );
   }
   return (
     <div className="text-left text-lg py-3 m-auto flex justify-center">

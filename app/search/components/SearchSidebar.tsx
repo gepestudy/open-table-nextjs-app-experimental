@@ -1,33 +1,118 @@
-const SearchSidebar = () => {
+import prisma from "@/prisma/prisma";
+import { PRICE } from "@prisma/client";
+import Link from "next/link";
+
+interface IProps {
+  locations: {
+    name: string;
+    id: number;
+  }[];
+  cuisines: {
+    name: string;
+    id: number;
+  }[];
+  searchParams?: {
+    city: string | undefined;
+    cuisine: string | undefined;
+    price?: PRICE | undefined;
+  };
+}
+
+const SearchSidebar = ({ locations, cuisines, searchParams }: IProps) => {
+  const prices = [
+    {
+      price: PRICE.CHEAP,
+      label: "$",
+      classname: `rounded-l`,
+    },
+    {
+      price: PRICE.REGULAR,
+      label: "$$",
+      classname: null,
+    },
+    {
+      price: PRICE.EXPENSIVE,
+      label: "$$$",
+      classname: `rounded-r`,
+    },
+  ];
+
   return (
-    <div className="w-1/5">
+    <div className="w-1/5 mr-5">
       <div className="border-b pb-4">
         <h1 className="mb-2">Region</h1>
-        <p className="font-light text-reg">Toronto</p>
-        <p className="font-light text-reg">Ottawa</p>
-        <p className="font-light text-reg">Montreal</p>
-        <p className="font-light text-reg">Hamilton</p>
-        <p className="font-light text-reg">Kingston</p>
-        <p className="font-light text-reg">Niagara</p>
+        {!locations ? (
+          <p>could not get location</p>
+        ) : (
+          locations.map((location) => (
+            <Link
+              href={{
+                pathname: "/search",
+                query: {
+                  ...searchParams,
+                  city: location.name,
+                },
+              }}
+              key={location.id}
+            >
+              <p
+                className={`${
+                  location.name == searchParams?.city && "font-medium"
+                } font-light text-reg`}
+              >
+                {location.name}
+              </p>
+            </Link>
+          ))
+        )}
       </div>
       <div className="border-b pb-4 mt-3">
         <h1 className="mb-2">Cuisine</h1>
-        <p className="font-light text-reg">Mexican</p>
-        <p className="font-light text-reg">Italian</p>
-        <p className="font-light text-reg">Chinese</p>
+        {!cuisines ? (
+          <p>could not get location</p>
+        ) : (
+          cuisines.map((cuisine) => (
+            <Link
+              href={{
+                pathname: "/search",
+                query: {
+                  ...searchParams,
+                  cuisine: cuisine.name,
+                },
+              }}
+              key={cuisine.id}
+            >
+              <p
+                className={`${
+                  cuisine.name == searchParams?.cuisine && "font-medium text-lg"
+                } font-light text-reg`}
+              >
+                {cuisine.name}
+              </p>
+            </Link>
+          ))
+        )}
       </div>
       <div className="mt-3 pb-4">
         <h1 className="mb-2">Price</h1>
         <div className="flex">
-          <button className="border w-full text-reg font-light rounded-l p-2">
-            $
-          </button>
-          <button className="border-r border-t border-b w-full text-reg font-light p-2">
-            $$
-          </button>
-          <button className="border-r border-t border-b w-full text-reg font-light p-2 rounded-r">
-            $$$
-          </button>
+          {prices.map(({ label, price, classname }) => (
+            <Link
+              href={{
+                pathname: "/search",
+                query: {
+                  ...searchParams,
+                  price,
+                },
+              }}
+              className={`${
+                searchParams?.price == price && "bg-slate-200 text-lg"
+              } ${classname} border w-full text-reg font-light p-2 text-center`}
+              key={price}
+            >
+              {label}
+            </Link>
+          ))}
         </div>
       </div>
     </div>
