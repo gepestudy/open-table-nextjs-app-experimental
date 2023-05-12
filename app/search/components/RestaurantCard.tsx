@@ -1,6 +1,8 @@
-import { PRICE } from "@prisma/client";
+import { PRICE, Review } from "@prisma/client";
 import Link from "next/link";
 import Price from "../../components/price/Price";
+import { getAvgRating } from "@/src/utils/formatedRating/formatedRatting";
+import Stars from "@/app/components/cards/Stars";
 interface IProps {
   restaurant_name: string;
   location_name: string;
@@ -8,6 +10,7 @@ interface IProps {
   price: PRICE;
   image: string;
   cuisine: string;
+  reviews: Review[];
 }
 
 const RestaurantCard = ({
@@ -17,7 +20,20 @@ const RestaurantCard = ({
   slug,
   image,
   cuisine,
+  reviews,
 }: IProps) => {
+  function renderRatingText() {
+    const formatedRating = getAvgRating(reviews);
+    if (formatedRating > 4) {
+      return "Awesome";
+    } else if (formatedRating <= 4 && formatedRating > 3) {
+      return "Good";
+    } else if (formatedRating <= 3 && formatedRating > 0) {
+      return "Average";
+    } else {
+      return "";
+    }
+  }
   return (
     <div className="border-b flex pb-5">
       <Link href={`/restaurant/${slug}`}>
@@ -28,8 +44,10 @@ const RestaurantCard = ({
           <h2 className="text-3xl">{restaurant_name}</h2>
         </Link>
         <div className="flex items-start">
-          <div className="flex mb-2">*****</div>
-          <p className="ml-2 text-sm">Awesome</p>
+          <div className="flex mb-2">
+            <Stars reviews={reviews} />
+          </div>
+          <p className="ml-2 text-sm">{renderRatingText()}</p>
         </div>
         <div className="mb-9">
           <div className="font-light flex text-reg">

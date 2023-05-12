@@ -7,6 +7,8 @@ import ReservationCard from "./components/ReservationCard";
 import RestaurantNavbar from "./components/RestaurantNavbar";
 import Reviews from "./components/Reviews";
 import Title from "./components/Title";
+import { Review } from "@prisma/client";
+import { getAvgRating } from "@/src/utils/formatedRating/formatedRatting";
 
 interface Restaurant {
   id: number;
@@ -14,6 +16,7 @@ interface Restaurant {
   images: string[];
   description: string;
   slug: string;
+  reviews: Review[];
 }
 const fetchRestaurant = async (slug: string): Promise<Restaurant | null> => {
   const restaurant = await prisma.restaurant.findUnique({
@@ -26,6 +29,7 @@ const fetchRestaurant = async (slug: string): Promise<Restaurant | null> => {
       images: true,
       description: true,
       slug: true,
+      reviews: true,
     },
   });
   return restaurant;
@@ -35,15 +39,16 @@ const RestaurantDetail = async ({ params }: { params: { slug: string } }) => {
   if (!restaurant) {
     redirect("/404");
   }
+
   return (
     <>
       <div className="bg-white w-[70%] rounded p-3 shadow">
         <RestaurantNavbar slug={restaurant.slug} />
         <Title name={restaurant.name} />
-        <Rating />
+        <Rating reviews={restaurant.reviews} />
         <Description description={restaurant.description} />
         <Images images={restaurant.images} />
-        <Reviews />
+        <Reviews reviews={restaurant.reviews} />
       </div>
       <div className="w-[27%] relative text-reg">
         <ReservationCard />

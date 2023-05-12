@@ -4,10 +4,6 @@ const Header = ({ name }: { name: string }) => {
     nameArray[nameArray.length - 1] = `(${nameArray[nameArray.length - 1]})`;
     return nameArray.join(" ");
   };
-  // console.log({
-  //   title: renderTitle(),
-  //   minus1: renderTitle()[renderTitle().length - 1],
-  // });
 
   return (
     <div className="h-96 overflow-hidden">

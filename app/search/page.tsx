@@ -1,5 +1,5 @@
 import prisma from "@/prisma/prisma";
-import { PRICE } from "@prisma/client";
+import { PRICE, Review } from "@prisma/client";
 import Header from "./components/Header";
 import RestaurantCard from "./components/RestaurantCard";
 import SearchSidebar from "./components/SearchSidebar";
@@ -11,19 +11,20 @@ interface IProps {
     price: PRICE | undefined;
   };
 }
-interface IRestaurant {
-  name: string;
+// interface IRestaurant {
+//   name: string;
 
-  slug: string;
-  price: PRICE;
-  main_image: string;
-  location: {
-    name: string;
-  };
-  cuisine: {
-    name: string;
-  };
-}
+//   slug: string;
+//   price: PRICE;
+//   main_image: string;
+//   location: {
+//     name: string;
+//   };
+//   cuisine: {
+//     name: string;
+//   };
+//   reviews: Review[];
+// }
 
 const fetchRestaurants = async ({
   city,
@@ -39,6 +40,7 @@ const fetchRestaurants = async ({
     slug: true,
     main_image: true,
     price: true,
+    reviews: true,
     cuisine: {
       select: {
         name: true,
@@ -130,7 +132,7 @@ function fetchAllCuisine() {
 }
 
 const Search = async ({ searchParams }: IProps) => {
-  const restaurants: IRestaurant[] = await fetchRestaurants(searchParams);
+  const restaurants = await fetchRestaurants(searchParams);
   const locations = await fetchAllLocation();
   const cuisines = await fetchAllCuisine();
 
@@ -147,8 +149,9 @@ const Search = async ({ searchParams }: IProps) => {
           {restaurants.length == 0 || restaurants == null ? (
             <p>There are no restaurants in the city you are looking for</p>
           ) : (
-            restaurants.map((restaurant: IRestaurant) => (
+            restaurants.map((restaurant) => (
               <RestaurantCard
+                reviews={restaurant.reviews}
                 restaurant_name={restaurant.name}
                 location_name={restaurant.location.name}
                 price={restaurant.price}

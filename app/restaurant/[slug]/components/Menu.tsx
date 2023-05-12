@@ -9,8 +9,6 @@ interface Props {
 }
 
 const Menu = ({ menu }: Props) => {
-  console.log({ menu });
-
   return (
     <main className="bg-white mt-5">
       <div>
