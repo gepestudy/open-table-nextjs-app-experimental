@@ -1,5 +1,6 @@
 import prisma from "@/prisma/prisma";
-import { redirect } from "next/navigation";
+import { Review } from "@prisma/client";
+import { notFound, redirect } from "next/navigation";
 import Description from "./components/Description";
 import Images from "./components/Images";
 import Rating from "./components/Rating";
@@ -7,8 +8,6 @@ import ReservationCard from "./components/ReservationCard";
 import RestaurantNavbar from "./components/RestaurantNavbar";
 import Reviews from "./components/Reviews";
 import Title from "./components/Title";
-import { Review } from "@prisma/client";
-import { getAvgRating } from "@/src/utils/formatedRating/formatedRatting";
 
 interface Restaurant {
   id: number;
@@ -34,10 +33,11 @@ const fetchRestaurant = async (slug: string): Promise<Restaurant | null> => {
   });
   return restaurant;
 };
+
 const RestaurantDetail = async ({ params }: { params: { slug: string } }) => {
   const restaurant = await fetchRestaurant(params.slug);
   if (!restaurant) {
-    redirect("/404");
+    notFound();
   }
 
   return (
