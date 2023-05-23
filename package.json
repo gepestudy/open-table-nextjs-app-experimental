@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "next dev",
     "reset:db": "npx prisma db push --force-reset && npx prisma db push",
     "build": "next build",
