@@ -11,8 +11,7 @@ export default async function requestLimiterMiddleware(
   req: NextRequest,
   next: any
 ) {
-  const clientIP =
-    req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip");
+  const clientIP = req.ip;
 
   console.log({ iniIpnyaya: clientIP });
   next();
