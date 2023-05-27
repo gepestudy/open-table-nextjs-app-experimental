@@ -3,7 +3,7 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthModalInput from "./AuthModalInput";
 
 const style = {
@@ -20,14 +20,14 @@ const style = {
 
 export default function AuthModal({ signin }: { signin?: boolean }) {
   const [open, setOpen] = useState(false);
-  const [inputs, setInputs] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    city: "",
-    password: "",
-  });
+  // const [inputs, setInputs] = useState({
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   phone: "",
+  //   city: "",
+  //   password: "",
+  // });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -36,12 +36,12 @@ export default function AuthModal({ signin }: { signin?: boolean }) {
     return signin ? signInContent : signUpContent;
   };
 
-  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputs({
-      ...inputs,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setInputs({
+  //     ...inputs,
+  //     [e.target.name]: e.target.value,
+  //   });
+  // };
 
   return (
     <div>
@@ -76,21 +76,10 @@ export default function AuthModal({ signin }: { signin?: boolean }) {
                 )}
               </h2>
               <AuthModalInput
-                inputs={inputs}
-                handleChangeInput={handleChangeInput}
+                // inputs={inputs}
+                // handleChangeInput={handleChangeInput}
                 signin={signin}
               />
-              <Button
-                variant="contained"
-                fullWidth
-                className={`${
-                  signin
-                    ? "bg-red-600 hover:bg-red-700"
-                    : "bg-blue-400 hover:bg-blue-500"
-                } font-medium tracking-widest disabled:bg-gray-400`}
-              >
-                {renderContent("Sign In", "Sign Up")}
-              </Button>
             </div>
           </div>
         </Box>

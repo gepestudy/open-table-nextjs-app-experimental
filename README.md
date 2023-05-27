@@ -1,3 +1,20 @@
+# website yang membantu saat membuat aplikasi
+
+- https://reacthustle.com/blog/how-to-chain-multiple-middleware-functions-in-nextjs
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
