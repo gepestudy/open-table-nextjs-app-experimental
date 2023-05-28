@@ -1,6 +1,11 @@
 "use client";
 import { useState } from "react";
-import { ISignup, signupSchema } from "@/app/api/config/zod/authSchema";
+import {
+  ISignup,
+  ISignin,
+  signupSchema,
+  signinScheme,
+} from "@/app/api/config/zod/authSchema";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, TextField } from "@mui/material";
@@ -16,6 +21,14 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
     resolver: zodResolver(signupSchema),
   });
 
+  const {
+    register: registerSignin,
+    handleSubmit: handleSubmitSignin,
+    formState: { errors: errorsSignin },
+  } = useForm<ISignin>({
+    resolver: zodResolver(signinScheme),
+  });
+
   const onSignup: SubmitHandler<ISignup> = async (data) => {
     setIsLoading(true);
     const res = await fetch("/api/auth/signup", {
@@ -29,11 +42,26 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
         console.log(err);
       });
     setIsLoading(false);
-    console.log({ res });
+  };
+
+  const onSignin: SubmitHandler<ISignin> = async (data) => {
+    setIsLoading(true);
+    const res = await fetch("/api/auth/signin", {
+      body: JSON.stringify(data),
+      method: "POST",
+    })
+      .then((res) => res.json())
+      .catch((err) => {
+        setErrorSubmiting(err.message);
+        setIsLoading(false);
+      });
+    setIsLoading(false);
   };
 
   return (
-    <form onSubmit={signin ? undefined : handleSubmit(onSignup)}>
+    <form
+      onSubmit={signin ? handleSubmitSignin(onSignin) : handleSubmit(onSignup)}
+    >
       {signin ? null : (
         <>
           <div className="my-3 flex justify-between gap-2 text-sm">
@@ -69,7 +97,9 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
       <div className="my-3 flex justify-between gap-2 text-sm">
         <TextField
           className={`${errors.email && "border-red-500"}`}
-          {...register("email")}
+          {...(signin
+            ? { ...registerSignin("email") }
+            : { ...register("email") })}
           label="Email"
           size="small"
           fullWidth
@@ -112,18 +142,25 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
         </>
       )}
       {signin ? (
-        <div className="my-3 flex justify-between gap-2 text-sm">
-          <TextField
-            className={`${errors.password && "border-red-500"}`}
-            {...register("password")}
-            label="Password"
-            type="password"
-            size="small"
-            fullWidth
-            autoComplete="new-password"
-            name="password"
-          />
-        </div>
+        <>
+          <div className="my-3 flex justify-between gap-2 text-sm">
+            <TextField
+              className={`${errors.password && "border-red-500"}`}
+              {...registerSignin("password")}
+              label="Password"
+              type="password"
+              size="small"
+              fullWidth
+              autoComplete="new-password"
+              name="password"
+            />
+          </div>
+          {errorsSignin.password?.message && (
+            <p className="text-red-500 block">
+              {errorsSignin.password?.message}
+            </p>
+          )}
+        </>
       ) : (
         <>
           <div className="my-3 flex justify-between gap-2 text-sm">
