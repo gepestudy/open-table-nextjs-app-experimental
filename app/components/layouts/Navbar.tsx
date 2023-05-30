@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { User } from "@/src/redux/features/authSlicer";
 
 const Navbar = () => {
-  const { data, loading } = useAppSelector((state) => state.auth);
+  const { data } = useAppSelector((state) => state.auth);
 
   return (
     <nav className="bg-white p-2 flex justify-between">

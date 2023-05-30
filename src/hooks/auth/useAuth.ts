@@ -17,13 +17,10 @@ const useAuth = () => {
   ) => {
     try {
       dispatch(setAuthState({ data, error, loading: true }));
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/signin",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post("/api/auth/signin", {
+        email,
+        password,
+      });
       dispatch(
         setAuthState({ data: response.data, error: null, loading: false })
       );
@@ -77,18 +74,15 @@ const useAuth = () => {
   ) => {
     try {
       dispatch(setAuthState({ data: null, error: null, loading: true }));
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/signup",
-        {
-          firstName,
-          lastName,
-          email,
-          phone,
-          city,
-          password,
-          confirmPassword,
-        }
-      );
+      const response = await axios.post("/api/auth/signup", {
+        firstName,
+        lastName,
+        email,
+        phone,
+        city,
+        password,
+        confirmPassword,
+      });
       dispatch(
         setAuthState({ data: response.data, error: null, loading: false })
       );
