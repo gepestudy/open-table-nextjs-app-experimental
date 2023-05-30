@@ -1,5 +1,7 @@
+import ReduxProvider from "@/src/redux/ReduxProvider";
 import Navbar from "./components/layouts/Navbar";
 import "./globals.css";
+import AuthProvider from "./provider/AuthProvider";
 
 export const metadata = {
   title: "OpenTable",
@@ -17,12 +19,18 @@ export default function RootLayout({
         <link rel="icon" type="image/x-icon" href="/public/favicon.ico" />
       </head>
       <body>
-        <main className="bg-gray-100 min-h-screen min-w-screen">
-          <main className="max-w-screen-2xl m-auto bg-white">
-            <Navbar />
-            {children}
+        <ReduxProvider>
+          <main className="bg-gray-100 min-h-screen min-w-screen">
+            <main className="max-w-screen-2xl m-auto bg-white">
+              <AuthProvider>
+                <div>
+                  <Navbar />
+                  {children}
+                </div>
+              </AuthProvider>
+            </main>
           </main>
-        </main>
+        </ReduxProvider>
       </body>
     </html>
   );

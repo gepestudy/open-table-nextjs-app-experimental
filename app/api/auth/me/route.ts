@@ -2,7 +2,7 @@ import prisma from "@/prisma/prisma";
 import * as jose from "jose";
 import { headers } from "next/headers";
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   const headersList = headers();
   const token = headersList.get("authorization")?.split(" ")[1] as string;
 
@@ -34,10 +34,19 @@ export async function POST(req: Request) {
       }
     );
 
-  return new Response(JSON.stringify({ message: user }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return new Response(
+    JSON.stringify({
+      firstName: user.first_name,
+      lastName: user.last_name,
+      city: user.city,
+      phone: user.phone,
+      email: user.email,
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 }

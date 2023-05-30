@@ -3,8 +3,10 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AuthModalInput from "./AuthModalInput";
+import { Alert } from "@mui/material";
+import { useAppSelector } from "@/src/redux/store";
 
 const style = {
   position: "absolute" as "absolute",
@@ -19,29 +21,16 @@ const style = {
 };
 
 export default function AuthModal({ signin }: { signin?: boolean }) {
+  const { error, loading } = useAppSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
-  // const [inputs, setInputs] = useState({
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   phone: "",
-  //   city: "",
-  //   password: "",
-  // });
-
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {
+    if (loading) return;
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
-
   const renderContent = (signInContent: string, signUpContent: string) => {
     return signin ? signInContent : signUpContent;
   };
-
-  // const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setInputs({
-  //     ...inputs,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
 
   return (
     <div>
@@ -69,6 +58,11 @@ export default function AuthModal({ signin }: { signin?: boolean }) {
               <p className="text-sm">{signin ? "Sign In" : "Create Account"}</p>
             </div>
             <div className="m-auto">
+              {error && (
+                <Alert severity="error" className="my-3">
+                  {error}
+                </Alert>
+              )}
               <h2 className="text-2xl font-light text-center">
                 {renderContent(
                   "Log Into Your Account",
@@ -78,6 +72,7 @@ export default function AuthModal({ signin }: { signin?: boolean }) {
               <AuthModalInput
                 // inputs={inputs}
                 // handleChangeInput={handleChangeInput}
+                handleClose={handleClose}
                 signin={signin}
               />
             </div>

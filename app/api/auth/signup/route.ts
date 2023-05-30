@@ -74,10 +74,21 @@ export async function POST(req: NextRequest) {
     .sign(secret);
 
   // Return a 200 response with the signed JWT token
-  return new Response(JSON.stringify({ jwt }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return new Response(
+    JSON.stringify({
+      jwt,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      phone: user.phone,
+      city: user.city,
+    }),
+    {
+      status: 200,
+      headers: new Headers([
+        ["Set-Cookie", `jwt=${jwt}; Max-Age=${60 * 60 * 24}; Path=/`],
+        ["Content-Type", "application/json"],
+      ]),
+    }
+  );
 }

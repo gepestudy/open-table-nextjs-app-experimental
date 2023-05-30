@@ -1,8 +1,8 @@
+import prisma from "@/prisma/prisma";
+import { Cuisine, Location, PRICE, Review } from "@prisma/client";
 import { Inter } from "next/font/google";
 import RestaurantCard from "./components/cards/RestaurantCard";
 import Header from "./components/layouts/Header";
-import prisma from "@/prisma/prisma";
-import { Cuisine, Location, PRICE, Review } from "@prisma/client";
 
 const inter = Inter({ subsets: ["latin"] });
 

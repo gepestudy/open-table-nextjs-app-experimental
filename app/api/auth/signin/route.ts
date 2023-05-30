@@ -2,8 +2,10 @@ import prisma from "@/prisma/prisma";
 import { signinScheme } from "../../config/zod/authSchema";
 import bcrypt from "bcrypt";
 import * as jose from "jose";
+import { setCookie } from "cookies-next";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
   //   validation req body
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
     return new Response(
       JSON.stringify({ message: "wrong credentials please try again" }),
       {
-        status: 400,
+        status: 401,
         headers: {
           "Content-Type": "application/json",
         },
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
     return new Response(
       JSON.stringify({ message: "wrong credentials please try again" }),
       {
-        status: 400,
+        status: 401,
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,11 +62,32 @@ export async function POST(req: Request) {
     .setExpirationTime("15m")
     .sign(secret);
 
+  // Set the JWT token as a cookie
+  // setCookie("jwt", jwt, { httpOnly: true, maxAge: 60 * 60 * 24 });
   // Return a 200 response with the signed JWT token
-  return new Response(JSON.stringify({ jwt }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return new NextResponse(
+    JSON.stringify({
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      phone: user.phone,
+      city: user.city,
+      jwt,
+    }),
+    {
+      status: 200,
+      headers: new Headers([
+        ["Set-Cookie", `jwt=${jwt}; Max-Age=${60 * 60 * 24}; Path=/`],
+        ["Content-Type", "application/json"],
+      ]),
+    }
+  );
+
+  // return new Response(JSON.stringify({ jwt }), {
+  //   status: 200,
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "Set-Cookie": `jwt=${jwt}; HttpOnly; Max-Age=${60 * 60 * 24}; Path=/`,
+  //   },
+  // });
 }

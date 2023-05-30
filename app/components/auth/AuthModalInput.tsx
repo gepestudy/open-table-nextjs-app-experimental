@@ -1,71 +1,71 @@
-"use client";
-import { useState } from "react";
-import {
-  ISignup,
-  ISignin,
-  signupSchema,
-  signinScheme,
-} from "@/app/api/config/zod/authSchema";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, TextField } from "@mui/material";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import useAuth from "@/src/hooks/auth/useAuth";
+import { useAppSelector } from "@/src/redux/store";
+import {
+  ISignin,
+  ISignup,
+  signinScheme,
+  signupSchema,
+} from "@/app/api/config/zod/authSchema";
 
-const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorSubmiting, setErrorSubmiting] = useState(null);
+const AuthModalInput = ({
+  signin,
+  handleClose,
+}: {
+  signin: boolean | undefined;
+  handleClose: () => void;
+}) => {
+  const { data, loading, error } = useAppSelector((state) => state.auth);
+
+  const { signinHandler, signupHanlder } = useAuth();
+
+  const formConfig = useForm<ISignup>({
+    resolver: zodResolver(signupSchema),
+  });
+
+  const formConfigSignin = useForm<ISignin>({
+    resolver: zodResolver(signinScheme),
+  });
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ISignup>({
-    resolver: zodResolver(signupSchema),
-  });
+  } = formConfig;
 
   const {
     register: registerSignin,
     handleSubmit: handleSubmitSignin,
     formState: { errors: errorsSignin },
-  } = useForm<ISignin>({
-    resolver: zodResolver(signinScheme),
-  });
+  } = formConfigSignin;
 
   const onSignup: SubmitHandler<ISignup> = async (data) => {
-    setIsLoading(true);
-    const res = await fetch("/api/auth/signup", {
-      body: JSON.stringify(data),
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .catch((err) => {
-        setErrorSubmiting(err.message);
-        setIsLoading(false);
-        console.log(err);
-      });
-    setIsLoading(false);
+    try {
+      await signupHanlder(data, handleClose);
+    } catch (error) {
+      console.error({ ERROR_DARI_USEAUTH_SIGNUP: error });
+    }
   };
 
   const onSignin: SubmitHandler<ISignin> = async (data) => {
-    setIsLoading(true);
-    const res = await fetch("/api/auth/signin", {
-      body: JSON.stringify(data),
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .catch((err) => {
-        setErrorSubmiting(err.message);
-        setIsLoading(false);
-      });
-    setIsLoading(false);
+    try {
+      await signinHandler(data, handleClose);
+    } catch (error) {
+      console.error({ ERROR_DARI_USEAUTH_SIGNIN: error });
+    }
   };
 
   return (
     <form
       onSubmit={signin ? handleSubmitSignin(onSignin) : handleSubmit(onSignup)}
     >
-      {signin ? null : (
+      {!signin && (
         <>
           <div className="my-3 flex justify-between gap-2 text-sm">
             <TextField
+              disabled={loading}
               className={`${errors.firstName && "border-red-500"}`}
               {...register("firstName")}
               label="First Name"
@@ -76,6 +76,7 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
             />
 
             <TextField
+              disabled={loading}
               className={`${errors.lastName && "border-red-500"}`}
               {...register("lastName")}
               label="Last Name"
@@ -96,6 +97,7 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
       )}
       <div className="my-3 flex justify-between gap-2 text-sm">
         <TextField
+          disabled={loading}
           className={`${errors.email && "border-red-500"}`}
           {...(signin
             ? { ...registerSignin("email") }
@@ -109,20 +111,22 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
       {errors.email?.message && (
         <p className="text-red-500 block">{errors.email?.message}</p>
       )}
-      {signin ? null : (
+      {!signin && (
         <>
           <div className="my-3 flex justify-between gap-2 text-sm">
             <TextField
+              disabled={loading}
               className={`${errors.phone && "border-red-500"}`}
               {...register("phone")}
               label="Phone"
               size="small"
               fullWidth
               type="number"
-              inputProps={{ inputMode: "numeric", patern: "[0-9]*" }}
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
               name="phone"
             />
             <TextField
+              disabled={loading}
               className={`${errors.city && "border-red-500"}`}
               {...register("city")}
               label="City"
@@ -145,6 +149,7 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
         <>
           <div className="my-3 flex justify-between gap-2 text-sm">
             <TextField
+              disabled={loading}
               className={`${errors.password && "border-red-500"}`}
               {...registerSignin("password")}
               label="Password"
@@ -165,6 +170,7 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
         <>
           <div className="my-3 flex justify-between gap-2 text-sm">
             <TextField
+              disabled={loading}
               className={`${errors.password && "border-red-500"}`}
               {...register("password")}
               label="Password"
@@ -177,6 +183,7 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
           </div>
           <div className="my-3 flex justify-between gap-2 text-sm">
             <TextField
+              disabled={loading}
               className={`${errors.confirmPassword && "border-red-500"}`}
               {...register("confirmPassword")}
               label="Confirm Password"
@@ -189,10 +196,11 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
           </div>
         </>
       )}
-      {isLoading ? (
+
+      {loading ? (
         <>
           <Button
-            disabled={isLoading}
+            disabled={loading}
             variant="contained"
             type="submit"
             fullWidth
@@ -239,4 +247,5 @@ const AuthModalInput = ({ signin }: { signin: boolean | undefined }) => {
     </form>
   );
 };
+
 export default AuthModalInput;
