@@ -1,6 +1,7 @@
 import { setAuthState } from "@/src/redux/features/authSlicer";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import axios from "axios";
+import { removeCookies } from "cookies-next";
 
 const useAuth = () => {
   const { data, error, loading } = useAppSelector((state) => state.auth);
@@ -114,7 +115,12 @@ const useAuth = () => {
     }
   };
 
-  return { signinHandler, signupHanlder };
+  const signoutHandler = () => {
+    removeCookies("jwt");
+    dispatch(setAuthState({ data: null, error: null, loading: false }));
+  };
+
+  return { signinHandler, signupHanlder, signoutHandler };
 };
 
 export default useAuth;
